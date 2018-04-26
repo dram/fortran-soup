@@ -6,10 +6,21 @@ module soup
   include "constants.f90"
 
   interface
+     function soup_session_sync_new() bind(c)
+       use iso_c_binding, only: c_ptr
+       type(c_ptr) soup_session_sync_new
+     end function soup_session_sync_new
+
      function soup_session_new() bind(c)
        use iso_c_binding, only: c_ptr
        type(c_ptr) soup_session_new
      end function soup_session_new
+
+     function soup_request_get_content_length(request) bind(c)
+       use iso_c_binding, only: c_ptr, c_int64_t
+       type(c_ptr), value :: request
+       integer(c_int64_t) soup_request_get_content_length
+     end function soup_request_get_content_length
 
      function soup_request_send(request, cancellable, error) bind(c)
        use iso_c_binding, only: c_ptr
