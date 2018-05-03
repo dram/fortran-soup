@@ -6,6 +6,10 @@
 int main(void)
 {
 	printf(INT_PARAMETER
+	       "soup_memory_copy = %d\n",
+	       SOUP_MEMORY_COPY);
+
+	printf(INT_PARAMETER
 	       "soup_request_error_bad_uri = %d\n",
 	       SOUP_REQUEST_ERROR_BAD_URI);
 

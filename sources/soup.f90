@@ -6,6 +6,26 @@ module soup
   include "constants.f90"
 
   interface
+     function soup_message_headers_get_one(hdrs, name) bind(c)
+       use iso_c_binding, only: c_ptr
+       type(c_ptr), value :: hdrs, name
+       type(c_ptr) soup_message_headers_get_one
+     end function soup_message_headers_get_one
+
+     function soup_message_new(method, uri_string) bind(c)
+       use iso_c_binding, only: c_ptr
+       type(c_ptr), value :: method, uri_string
+       type(c_ptr) soup_message_new
+     end function soup_message_new
+
+     subroutine soup_message_set_request( &
+          msg, content_type, req_use, req_body, req_length) bind(c)
+       use iso_c_binding, only: c_int, c_ptr, c_size_t
+       type(c_ptr), value :: msg, content_type, req_body
+       integer(c_int), value :: req_use
+       integer(c_size_t), value :: req_length
+     end subroutine soup_message_set_request
+
      function soup_session_sync_new() bind(c)
        use iso_c_binding, only: c_ptr
        type(c_ptr) soup_session_sync_new
@@ -33,5 +53,12 @@ module soup
        type(c_ptr), value :: session, uri_string, error
        type(c_ptr) soup_session_request
      end function soup_session_request
+
+     function soup_session_send_message(session, msg) bind(c)
+       use iso_c_binding, only: c_int, c_ptr
+       type(c_ptr), value :: session, msg
+       integer(c_int) soup_session_send_message
+     end function soup_session_send_message
+
   end interface
 end module soup
