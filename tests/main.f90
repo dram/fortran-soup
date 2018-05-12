@@ -1,4 +1,5 @@
 program main
+  use cstrings
   use iso_c_binding
   use soup
   use soup_aux
@@ -9,8 +10,11 @@ program main
     integer(c_int) rc
     type(c_ptr) message, session, request, stream
 
+    call cstring_initialize
+
     session = soup_session_sync_new()
-    request = soup_aux_session_request(session, 'http://www.example.com')
+    request = soup_session_request( &
+         session, cstring('http://www.example.com'), c_null_ptr)
     stream = soup_request_send(request, c_null_ptr, c_null_ptr)
     print *, soup_request_get_content_length(request)
 
@@ -18,6 +22,8 @@ program main
     message = soup_aux_message_new('GET', 'http://www.example.com')
     rc = soup_session_send_message(session, message)
     print *, rc
+
+    call cstring_finalize
   end block
 
 end program main

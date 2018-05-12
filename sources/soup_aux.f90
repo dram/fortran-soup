@@ -8,8 +8,7 @@ module soup_aux
 
   public &
        soup_aux_message_headers_get_one, &
-       soup_aux_message_new, &
-       soup_aux_session_request
+       soup_aux_message_new
 
   interface
      pure function strlen(s) bind(c)
@@ -50,17 +49,5 @@ contains
     soup_aux_message_new = &
          soup_message_new(c_loc(method_buffer), c_loc(uri_buffer))
   end function soup_aux_message_new
-
-  function soup_aux_session_request(session, uri_string)
-    type(c_ptr), value :: session
-    character(*), intent(in) :: uri_string
-    type(c_ptr) soup_aux_session_request
-
-    character(:), allocatable, target :: buffer
-
-    buffer = uri_string // char(0)
-    soup_aux_session_request = &
-         soup_session_request(session, c_loc(buffer), c_null_ptr)
-  end function soup_aux_session_request
 
 end module soup_aux
