@@ -8,6 +8,11 @@ module soup
   include "constants.f90"
 
   interface
+     subroutine soup_message_headers_append(hdrs, name, value) bind(c)
+       use iso_c_binding, only: c_ptr
+       type(c_ptr), value :: hdrs, name, value
+     end subroutine soup_message_headers_append
+
      function soup_message_headers_get_one(hdrs, name) bind(c)
        use iso_c_binding, only: c_ptr
        type(c_ptr), value :: hdrs, name
@@ -37,6 +42,12 @@ module soup
        use iso_c_binding, only: c_ptr
        type(c_ptr) soup_session_new
      end function soup_session_new
+
+     function soup_session_send(session, msg, cancellable, error) bind(c)
+       use iso_c_binding, only: c_ptr
+       type(c_ptr), value :: session, msg, cancellable, error
+       type(c_ptr) soup_session_send
+     end function soup_session_send
 
      function soup_request_get_content_length(request) bind(c)
        use iso_c_binding, only: c_ptr, c_int64_t
