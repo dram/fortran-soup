@@ -7,7 +7,6 @@ module soup_aux
   private
 
   public &
-       soup_aux_message_headers_get_one, &
        soup_aux_message_new
 
   interface
@@ -19,24 +18,6 @@ module soup_aux
   end interface
 
 contains
-
-  function soup_aux_message_headers_get_one(hdrs, name)
-    type(c_ptr), value :: hdrs
-    character(*), intent(in) :: name
-    character(:), allocatable :: soup_aux_message_headers_get_one
-
-    character(:), allocatable, target :: buffer
-    type(c_ptr) cptr
-
-    buffer = name // char(0)
-    cptr = soup_message_headers_get_one(hdrs, c_loc(buffer))
-
-    block
-      character(strlen(cptr)), pointer :: fptr
-      call c_f_pointer(cptr, fptr)
-      soup_aux_message_headers_get_one = fptr
-    end block
-  end function soup_aux_message_headers_get_one
 
   function soup_aux_message_new(method, uri_string)
     character(*), intent(in) :: method, uri_string
