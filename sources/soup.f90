@@ -22,10 +22,10 @@ module soup
 
      subroutine soup_message_set_request( &
           msg, content_type, req_use, req_body, req_length) bind(c)
-       use iso_c_binding, only: c_int, c_ptr, c_size_t
+       use iso_c_binding, only: c_int, c_long, c_ptr
        type(c_ptr), value :: msg, content_type, req_body
        integer(c_int), value :: req_use
-       integer(c_size_t), value :: req_length
+       integer(c_long), value :: req_length
      end subroutine soup_message_set_request
 
      function soup_session_sync_new() bind(c)
