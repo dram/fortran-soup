@@ -19,7 +19,8 @@ program main
     print *, soup_request_get_content_length(request)
 
     session = soup_session_sync_new()
-    message = soup_aux_message_new('GET', 'http://www.example.com')
+    message = soup_message_new( &
+         cstring('GET'), cstring('http://www.example.com'))
     rc = soup_session_send_message(session, message)
     print *, rc
 
