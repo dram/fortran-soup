@@ -9,7 +9,7 @@ module soup
 
   integer(c_int), parameter :: SOUP_ADDRESS_FAMILY_INVALID = -1
   integer(c_int), parameter :: SOUP_ADDRESS_FAMILY_IPV4 = 2
-  integer(c_int), parameter :: SOUP_ADDRESS_FAMILY_IPV6 = 28
+  integer(c_int), parameter :: SOUP_ADDRESS_FAMILY_IPV6 = 10
   integer(c_int), parameter :: SOUP_CACHE_RESPONSE_FRESH = 0
   integer(c_int), parameter :: SOUP_CACHE_RESPONSE_NEEDS_VALIDATION = 1
   integer(c_int), parameter :: SOUP_CACHE_RESPONSE_STALE = 2
@@ -124,6 +124,7 @@ module soup
   integer(c_int), parameter :: SOUP_MESSAGE_NEW_CONNECTION = 64
   integer(c_int), parameter :: SOUP_MESSAGE_IDEMPOTENT = 128
   integer(c_int), parameter :: SOUP_MESSAGE_IGNORE_CONNECTION_LIMITS = 256
+  integer(c_int), parameter :: SOUP_MESSAGE_DO_NOT_USE_AUTH_CACHE = 512
   integer(c_int), parameter :: SOUP_MESSAGE_HEADERS_REQUEST = 0
   integer(c_int), parameter :: SOUP_MESSAGE_HEADERS_RESPONSE = 1
   integer(c_int), parameter :: SOUP_MESSAGE_HEADERS_MULTIPART = 2
@@ -694,6 +695,11 @@ module soup
       type(c_ptr), value :: password
       type(c_ptr) soup_auth_domain_digest_encode_password
     end function soup_auth_domain_digest_encode_password
+
+    subroutine soup_auth_manager_clear_cached_credentials(manager) bind(c)
+      use iso_c_binding, only: c_ptr
+      type(c_ptr), value :: manager
+    end subroutine soup_auth_manager_clear_cached_credentials
 
     subroutine soup_auth_manager_use_auth( &
         manager, &
@@ -1820,9 +1826,9 @@ module soup
         body, &
         offset &
     ) bind(c)
-      use iso_c_binding, only: c_ptr
+      use iso_c_binding, only: c_int64_t, c_ptr
       type(c_ptr), value :: body
-      type(c_ptr), value :: offset
+      integer(c_int64_t), value :: offset
       type(c_ptr) soup_message_body_get_chunk
     end function soup_message_body_get_chunk
 
@@ -1933,9 +1939,9 @@ module soup
     end function soup_message_headers_get_content_disposition
 
     function soup_message_headers_get_content_length(hdrs) bind(c)
-      use iso_c_binding, only: c_ptr
+      use iso_c_binding, only: c_int64_t, c_ptr
       type(c_ptr), value :: hdrs
-      type(c_ptr) soup_message_headers_get_content_length
+      integer(c_int64_t) soup_message_headers_get_content_length
     end function soup_message_headers_get_content_length
 
     function soup_message_headers_get_content_range( &
@@ -2006,9 +2012,9 @@ module soup
         ranges, &
         length &
     ) bind(c)
-      use iso_c_binding, only: c_bool, c_ptr
+      use iso_c_binding, only: c_bool, c_int64_t, c_ptr
       type(c_ptr), value :: hdrs
-      type(c_ptr), value :: total_length
+      integer(c_int64_t), value :: total_length
       type(c_ptr), value :: ranges
       type(c_ptr), value :: length
       logical(c_bool) soup_message_headers_get_ranges
@@ -2073,9 +2079,9 @@ module soup
         hdrs, &
         content_length &
     ) bind(c)
-      use iso_c_binding, only: c_ptr
+      use iso_c_binding, only: c_int64_t, c_ptr
       type(c_ptr), value :: hdrs
-      type(c_ptr), value :: content_length
+      integer(c_int64_t), value :: content_length
     end subroutine soup_message_headers_set_content_length
 
     subroutine soup_message_headers_set_content_range( &
@@ -2084,11 +2090,11 @@ module soup
         end, &
         total_length &
     ) bind(c)
-      use iso_c_binding, only: c_ptr
+      use iso_c_binding, only: c_int64_t, c_ptr
       type(c_ptr), value :: hdrs
-      type(c_ptr), value :: start
-      type(c_ptr), value :: end
-      type(c_ptr), value :: total_length
+      integer(c_int64_t), value :: start
+      integer(c_int64_t), value :: end
+      integer(c_int64_t), value :: total_length
     end subroutine soup_message_headers_set_content_range
 
     subroutine soup_message_headers_set_content_type( &
@@ -2125,10 +2131,10 @@ module soup
         start, &
         end &
     ) bind(c)
-      use iso_c_binding, only: c_ptr
+      use iso_c_binding, only: c_int64_t, c_ptr
       type(c_ptr), value :: hdrs
-      type(c_ptr), value :: start
-      type(c_ptr), value :: end
+      integer(c_int64_t), value :: start
+      integer(c_int64_t), value :: end
     end subroutine soup_message_headers_set_range
 
     subroutine soup_message_headers_set_ranges( &
@@ -2373,9 +2379,9 @@ module soup
     end function soup_proxy_uri_resolver_get_proxy_uri_sync
 
     function soup_request_get_content_length(request) bind(c)
-      use iso_c_binding, only: c_ptr
+      use iso_c_binding, only: c_int64_t, c_ptr
       type(c_ptr), value :: request
-      type(c_ptr) soup_request_get_content_length
+      integer(c_int64_t) soup_request_get_content_length
     end function soup_request_get_content_length
 
     function soup_request_get_content_type(request) bind(c)
@@ -3630,6 +3636,18 @@ module soup
       type(c_ptr) soup_websocket_connection_get_io_stream
     end function soup_websocket_connection_get_io_stream
 
+    function soup_websocket_connection_get_keepalive_interval(self) bind(c)
+      use iso_c_binding, only: c_int, c_ptr
+      type(c_ptr), value :: self
+      integer(c_int) soup_websocket_connection_get_keepalive_interval
+    end function soup_websocket_connection_get_keepalive_interval
+
+    function soup_websocket_connection_get_max_incoming_payload_size(self) bind(c)
+      use iso_c_binding, only: c_ptr
+      type(c_ptr), value :: self
+      type(c_ptr) soup_websocket_connection_get_max_incoming_payload_size
+    end function soup_websocket_connection_get_max_incoming_payload_size
+
     function soup_websocket_connection_get_origin(self) bind(c)
       use iso_c_binding, only: c_ptr
       type(c_ptr), value :: self
@@ -3673,6 +3691,24 @@ module soup
       type(c_ptr), value :: self
       type(c_ptr), value :: text
     end subroutine soup_websocket_connection_send_text
+
+    subroutine soup_websocket_connection_set_keepalive_interval( &
+        self, &
+        interval &
+    ) bind(c)
+      use iso_c_binding, only: c_int, c_ptr
+      type(c_ptr), value :: self
+      integer(c_int), value :: interval
+    end subroutine soup_websocket_connection_set_keepalive_interval
+
+    subroutine soup_websocket_connection_set_max_incoming_payload_size( &
+        self, &
+        max_incoming_payload_size &
+    ) bind(c)
+      use iso_c_binding, only: c_ptr
+      type(c_ptr), value :: self
+      type(c_ptr), value :: max_incoming_payload_size
+    end subroutine soup_websocket_connection_set_max_incoming_payload_size
 
     function soup_websocket_error_get_quark() bind(c)
       use iso_c_binding, only: c_ptr
@@ -3759,6 +3795,18 @@ module soup
       type(c_ptr), value :: data
       type(c_ptr) soup_add_timeout
     end function soup_add_timeout
+
+    function soup_check_version( &
+        major, &
+        minor, &
+        micro &
+    ) bind(c)
+      use iso_c_binding, only: c_bool, c_int
+      integer(c_int), value :: major
+      integer(c_int), value :: minor
+      integer(c_int), value :: micro
+      logical(c_bool) soup_check_version
+    end function soup_check_version
 
     subroutine soup_cookies_free(cookies) bind(c)
       use iso_c_binding, only: c_ptr
@@ -3902,6 +3950,21 @@ module soup
       type(c_ptr), value :: multipart
       type(c_ptr) soup_form_request_new_from_multipart
     end function soup_form_request_new_from_multipart
+
+    function soup_get_major_version() bind(c)
+      use iso_c_binding, only: c_int
+      integer(c_int) soup_get_major_version
+    end function soup_get_major_version
+
+    function soup_get_micro_version() bind(c)
+      use iso_c_binding, only: c_int
+      integer(c_int) soup_get_micro_version
+    end function soup_get_micro_version
+
+    function soup_get_minor_version() bind(c)
+      use iso_c_binding, only: c_int
+      integer(c_int) soup_get_minor_version
+    end function soup_get_minor_version
 
     function soup_header_contains( &
         header, &
