@@ -22,6 +22,7 @@ if __name__ == '__main__':
     types = {
         'gboolean': ('logical(c_bool)', 'c_bool'),
         'gint': ('integer(c_int)', 'c_int'),
+        'goffset': ('integer(c_int64_t)', 'c_int64_t'),
         'gsize': ('integer(c_long)', 'c_long'),
         'gssize': ('integer(c_long)', 'c_long'),
         'guint': ('integer(c_int)', 'c_int'),
