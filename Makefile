@@ -11,7 +11,7 @@ run: build
 	@${PROGRAM}
 
 sources/soup.f90: tools/api-translator.py
-	$< soup /usr/local/share/gir-1.0/Soup-2.4.gir >$@
+	$< soup /usr/share/gir-1.0/Soup-2.4.gir >$@
 
 %.o: %.f90
 	${CC} -Wall -J ${MODULES_DIR} -o $@ -c $<
